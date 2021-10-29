@@ -50,6 +50,7 @@ make backup-firmware
 make install-firmware
 mv /lib/modules/4.19.66+/kernel/drivers/net/wireless/broadcom/brcm80211/brcmfmac/ old.bak
 cp /home/pi/nexmon/patches/bcm43455c0/7_45_189/nexmon/brcmfmac_4.19.y-nexmon/brcmfmac.ko /lib/modules/4.19.66+/kernel/drivers/net/wireless/broadcom/brcm80211/brcmfmac/
+sudo reboot now
 ```
 
 ### OWL
@@ -75,6 +76,24 @@ sudo pip3 install ./opendrop
 cd ~
 cd AirPi
 chmod +x airpi.sh
+```
+
+### Setup as USB Stick
+```bash
+cd ~
+echo "dtoverlay=dwc2" | sudo tee -a /boot/config.txt
+echo "dwc2" | sudo tee -a /etc/modules
+
+sudo dd bs=1M if=/dev/zero of=/piusb.bin count=1024
+sudo mkdosfs /piusb.bin -F 32 -I
+sudo mkdir /mnt/usb_share
+echo "/piusb.bin /mnt/usb_share vfat users,umask=000 0 2" | sudo tee -a /etc/fstab
+
+sudo mount -a
+cd /mnt/usb_share/
+echo "If you can read this everything is working!" > readme.txt
+sync
+sudo modprobe g_mass_storage file=/piusb.bin stall=0 removable=1 ro=1 iProduct="AirPi"  iSerialNumber=1234567890
 ```
 
 ### Final Steps
